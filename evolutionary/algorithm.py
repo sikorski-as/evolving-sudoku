@@ -17,8 +17,8 @@ def create_toolbox():
     toolbox.register("evaluate", validate_chromosome)
     # toolbox.register("select", tools.selTournament, tournsize=2)
     toolbox.register("select", tools.selBest)
-    # toolbox.register("mate", crossovers.swap_rows)
-    toolbox.register("mate", crossovers.swap_squares)
+    toolbox.register("mate", crossovers.swap_rows)
+    # toolbox.register("mate", crossovers.swap_squares)
     toolbox.register("mutate", mutations.random_9_square)
     return toolbox
 
@@ -29,12 +29,12 @@ def run(cfg: config.EvolutionConfig) -> None:
 
     toolbox = create_toolbox()
 
-    population = toolbox.population(n=10)
+    population = toolbox.population(n=cfg.population_size)
     fitnesses = [toolbox.evaluate(el) for el in population]
     for ind, fit in zip(population, fitnesses):
         ind.fitness.values = fit
 
-    CXPB, MXPB = 0.5, 0.2
+    CXPB, MXPB = 0.4, 0.3
 
     i = 0
     while cfg.max_iterations > i:

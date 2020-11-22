@@ -1,11 +1,9 @@
 import random
 from copy import copy
 
-import numpy as np
-
 
 def swap_rows(ind1, ind2):
-    begin, end = 3, 6
+    begin, end = random.choice(ranges)
     part1 = copy(ind1.sudoku[begin:end, :])
     part2 = copy(ind2.sudoku[begin:end, :])
     ind1.sudoku[begin:end, :], ind2.sudoku[begin:end, :] = part2, part1
