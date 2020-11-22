@@ -1,4 +1,8 @@
+from typing import Tuple
+
 import numpy as np
+
+from evolutionary.chromosome import Chromosome
 
 
 def check_repetitions(row) -> int:
@@ -13,7 +17,11 @@ def check_repetitions(row) -> int:
     return 9 - len(numbers)
 
 
-def validate(sudoku: np.ndarray) -> int:
+def validate_chromosome(chromosome: Chromosome) -> Tuple[int]:
+    return _validate(chromosome.sudoku),
+
+
+def _validate(sudoku: np.ndarray) -> int:
     """
         Checks if sudoku is correctly solved
         :param sudoku instance

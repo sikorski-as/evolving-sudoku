@@ -1,5 +1,5 @@
 import unittest
-from evaluation import validate
+from evaluation import _validate
 import numpy as np
 
 
@@ -43,13 +43,13 @@ class EvaluationTestCase(unittest.TestCase):
         self.row_error = 8
 
     def test_evaluation_bad_rows(self):
-        self.assertEqual(validate(self.sudoku_with_bad_rows), 9 * self.row_error + 9 * self.square_error)
+        self.assertEqual(_validate(self.sudoku_with_bad_rows), 9 * self.row_error + 9 * self.square_error)
 
     def test_evaluation_bad_columns(self):
-        self.assertEqual(validate(self.sudoku_with_bad_columns), 9 * self.row_error + 9 * self.square_error)
+        self.assertEqual(_validate(self.sudoku_with_bad_columns), 9 * self.row_error + 9 * self.square_error)
 
     def test_evaluation_correct(self):
-        self.assertEqual(validate(self.correct_sudoku), 0)
+        self.assertEqual(_validate(self.correct_sudoku), 0)
 
 
 if __name__ == '__main__':

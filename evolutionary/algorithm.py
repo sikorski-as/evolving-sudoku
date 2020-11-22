@@ -1,20 +1,70 @@
-import tools
-from evaluation import validate
-from evolutionary import chromosome, config
+from copy import copy
+from random import random
+
+from evaluation import validate_chromosome
+from evolutionary import chromosome, config, mutations, crossovers
+from deap import creator, tools, base
+
+
+def generate_chromosome(cls, sudoku):
+    return cls(*chromosome.generate_random_sudoku_instance_with_constraints(sudoku))
+
+
+def create_toolbox():
+    toolbox = base.Toolbox()
+    toolbox.register("individual", generate_chromosome, creator.Individual, cfg.sudoku_instance)
+    toolbox.register("population", tools.initRepeat, list, toolbox.individual)
+    toolbox.register("evaluate", validate_chromosome)
+    # toolbox.register("select", tools.selTournament, tournsize=2)
+    toolbox.register("select", tools.selBest)
+    toolbox.register("mate", crossovers.swap_rows)
+    return toolbox
 
 
 def run(cfg: config.EvolutionConfig) -> None:
-    population = chromosome.create_random(cfg.sudoku_instance, 10)
-    for el in population:
-        el.score = validate(el.sudoku)
+    creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
+    creator.create("Individual", chromosome.Chromosome, fitness=creator.FitnessMin)
+
+    toolbox = create_toolbox()
+
+    population = toolbox.population(n=10)
+    fitnesses = [toolbox.evaluate(el) for el in population]
+    for ind, fit in zip(population, fitnesses):
+        ind.fitness.values = fit
+
+    CXPB, MXPB = 0.5, 0.2
+
+    i = 0
+    while cfg.max_iterations > i:
+        i += 1
+        # Select the next generation individuals
+        offspring = toolbox.select(population, len(population))
+        # Clone the selected individuals
+        offspring = list(map(toolbox.clone, offspring))
+
+        for child1, child2 in zip(offspring[::2], offspring[1::2]):
+            if random() < CXPB:
+                toolbox.mate(child1, child2)
+                del child1.fitness.values
+                del child2.fitness.values
+
+        # for mutant in offspring:
+        #     if random() < MXPB:
+        #         toolbox.mutate(mutant)
+        #         del mutant.fitness.values
+
+        invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
+        fitnesses = map(toolbox.evaluate, invalid_ind)
+        for ind, fit in zip(invalid_ind, fitnesses):
+            ind.fitness.values = fit
+        population[:] = offspring
+        best = tools.selBest(population, 1)[0]
+        print(best.fitness)
+
+    best = tools.selBest(population, 1)[0]
+    print(best.fitness)
 
 
 if __name__ == '__main__':
-    sample_sudoku_instances = tools.load_instances("../data/instances.json")
-
-    ecfg = config.EvolutionConfig(
-        sudoku_instance=sample_sudoku_instances['easy'][0]['puzzle'],
-        max_iterations=2
-    )
-
-    run(ecfg)
+    cfg = config.DefaultConfig
+    run(cfg)
