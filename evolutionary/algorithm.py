@@ -17,8 +17,9 @@ def create_toolbox():
     toolbox.register("evaluate", validate_chromosome)
     # toolbox.register("select", tools.selTournament, tournsize=2)
     toolbox.register("select", tools.selBest)
-    toolbox.register("mate", crossovers.swap_rows)
-    # toolbox.register("mate", crossovers.swap_squares)
+    toolbox.register("mate_r", crossovers.swap_rows)
+    toolbox.register("mate_c", crossovers.swap_columns)
+    toolbox.register("mate_s", crossovers.swap_squares)
     toolbox.register("mutate", mutations.random_9_square)
     return toolbox
 
@@ -34,7 +35,7 @@ def run(cfg: config.EvolutionConfig) -> None:
     for ind, fit in zip(population, fitnesses):
         ind.fitness.values = fit
 
-    CXPB, MXPB = 0.4, 0.3
+    CXPB, MXPB = 0.6, 0.25
 
     i = 0
     while cfg.max_iterations > i:
@@ -46,7 +47,13 @@ def run(cfg: config.EvolutionConfig) -> None:
 
         for child1, child2 in zip(offspring[::2], offspring[1::2]):
             if random() < CXPB:
-                toolbox.mate(child1, child2)
+                if random() < 0.8:
+                    if random() < 0.5:
+                        toolbox.mate_c(child1, child2)
+                    else:
+                        toolbox.mate_r(child1, child2)
+                else:
+                    toolbox.mate_s(child1, child2)
                 del child1.fitness.values
                 del child2.fitness.values
 

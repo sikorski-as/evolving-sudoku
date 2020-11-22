@@ -2,6 +2,14 @@ import random
 from copy import copy
 
 
+def swap_columns(ind1, ind2):
+    begin, end = random.choice(ranges)
+    part1 = copy(ind1.sudoku[:, begin:end])
+    part2 = copy(ind2.sudoku[:, begin:end])
+    ind1.sudoku[:, begin:end], ind2.sudoku[:, begin:end] = part2, part1
+    return ind1, ind2
+
+
 def swap_rows(ind1, ind2):
     begin, end = random.choice(ranges)
     part1 = copy(ind1.sudoku[begin:end, :])
