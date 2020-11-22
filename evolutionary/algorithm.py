@@ -17,7 +17,8 @@ def create_toolbox():
     toolbox.register("evaluate", validate_chromosome)
     # toolbox.register("select", tools.selTournament, tournsize=2)
     toolbox.register("select", tools.selBest)
-    toolbox.register("mate", crossovers.swap_rows)
+    # toolbox.register("mate", crossovers.swap_rows)
+    toolbox.register("mate", crossovers.swap_squares)
     toolbox.register("mutate", mutations.random_9_square)
     return toolbox
 

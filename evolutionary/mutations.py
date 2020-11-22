@@ -12,7 +12,7 @@ def random_9_square(ind):
     With given probability generates random 3x3 square with 1-9 numbers
     :param ind: individual to be mutated
     """
-    prob = 75
+    prob = 20
     ranges = [[0, 3], [3, 6], [6, 9]]
     for xbegin, xend in ranges:
         for ybegin, yend in ranges:
