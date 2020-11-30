@@ -12,15 +12,16 @@ def generate_chromosome(cls, sudoku, sudoku_generating_function):
 def create_toolbox():
     toolbox = base.Toolbox()
     toolbox.register("individual", generate_chromosome, creator.Individual, cfg.sudoku_instance,
-                     chromosome.generate_random_sudoku_instance_with_constraints)
+                     chromosome.generate_random_sudoku_instance_with_square_constraints)
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)
     toolbox.register("evaluate", validate_chromosome)
-    # toolbox.register("select", tools.selTournament, tournsize=2)
+    toolbox.register("select", tools.selTournament, tournsize=2)
     toolbox.register("select", tools.selBest)
     toolbox.register("mate_r", crossovers.swap_rows)
     toolbox.register("mate_c", crossovers.swap_columns)
     toolbox.register("mate_s", crossovers.swap_squares)
     toolbox.register("mutate", mutations.random_9_square)
+    toolbox.register("mutate_swap", mutations.random_swap_in_square)
     return toolbox
 
 
@@ -35,7 +36,7 @@ def run(cfg: config.EvolutionConfig) -> None:
     for ind, fit in zip(population, fitnesses):
         ind.fitness.values = fit
 
-    CXPB, MXPB = 0.6, 0.25
+    CXPB, MXPB = 0.2, 0.15
 
     i = 0
     while cfg.max_iterations > i:
@@ -47,7 +48,7 @@ def run(cfg: config.EvolutionConfig) -> None:
 
         for child1, child2 in zip(offspring[::2], offspring[1::2]):
             if random() < CXPB:
-                if random() < 0.8:
+                if random() < 0.6:
                     if random() < 0.5:
                         toolbox.mate_c(child1, child2)
                     else:
@@ -59,7 +60,10 @@ def run(cfg: config.EvolutionConfig) -> None:
 
         for mutant in offspring:
             if random() < MXPB:
-                toolbox.mutate(mutant)
+                if random() < 0.1:
+                    toolbox.mutate(mutant)
+                else:
+                    toolbox.mutate_swap(mutant)
                 del mutant.fitness.values
 
         invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
@@ -68,6 +72,7 @@ def run(cfg: config.EvolutionConfig) -> None:
             ind.fitness.values = fit
         population = offspring + population
         population = tools.selTournament(population, k=cfg.population_size, tournsize=4)
+        # population = tools.selBest(population, k=cfg.population_size)
         best = tools.selBest(population, 1)[0]
         print(best.fitness)
 
