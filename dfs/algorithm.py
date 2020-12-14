@@ -1,6 +1,6 @@
-from collections import defaultdict
-from pprint import pprint
+import time
 
+from evaluation import is_row_valid, is_column_valid, is_square_valid, _validate
 from dfs import config
 
 
@@ -42,6 +42,17 @@ def run(cfg: config.DFSConfig) -> None:
     sudoku = cfg.sudoku_instance
     possibilities = _precompute_possibilities(sudoku)
 
+    start = time.time()
+    solution = _dfs(sudoku, possibilities)
+    end = time.time()
+
+    print('solution found by DFS in {} seconds:'.format(end - start))
+    print(solution)
+    print('repetitions:', _validate(solution))
+    print('solution from dataset:')
+    print(cfg.sudoku_solution)
+    print('are they the same?', solution == cfg.sudoku_solution)
+
 
 def sudoku_iterator(current_row, current_column):
     nrow = current_row + 1
@@ -62,7 +73,7 @@ def _dfs(sudoku, possibilities, row=0, col=0):
     else:
         for possible_number in possibilities[(row, col)]:
             sudoku[row, col] = possible_number
-            valid = check_row(sudoku, row, col) and check_column(sudoku, row, col) and check_square(sudoku, row, col)
+            valid = is_row_valid(sudoku, row, col) and is_column_valid(sudoku, row, col) and is_square_valid(sudoku, row, col)
             if valid:
                 nrow, ncol = sudoku_iterator(row, col)
                 solution = _dfs(sudoku, possibilities, nrow, ncol)
@@ -70,6 +81,9 @@ def _dfs(sudoku, possibilities, row=0, col=0):
                     return solution
                 else:
                     continue
+
+        sudoku[row, col] = 0
+        print('failed, backtracking ({}, {})'.format(row, col))
         return None
 
 
