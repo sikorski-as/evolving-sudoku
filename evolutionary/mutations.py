@@ -13,11 +13,11 @@ def random_9_square(ind):
     :param ind: individual to be mutated
     Algorithm is checking which fields are set at the beginning of sudoku and then applies numbers for rest of fields.
     """
-    prob = 10
+    prob = 0.1
     ranges = [[0, 3], [3, 6], [6, 9]]
     for xbegin, xend in ranges:
         for ybegin, yend in ranges:
-            if prob > random.randint(1, 100):
+            if random.random() < prob:
                 available_numbers = set(range(1, 10))
                 static_points = []
                 for x, y in ind.starting_points:
@@ -33,15 +33,14 @@ def random_9_square(ind):
                             ind.sudoku[x, y] = ind.sudoku_instance[x, y]
 
 
-def random_swap_in_square(ind):
+def random_swap_in_square(ind, prob_per_square=0.2):
     """
     With given probability take 2 numbers in square and swap their positions.
     """
-    prob = 20
     ranges = [[0, 3], [3, 6], [6, 9]]
     for xbegin, xend in ranges:
         for ybegin, yend in ranges:
-            if prob > random.randint(1, 100):
+            if random.random() < prob_per_square:
                 available_points = [(x, y) for x in range(xbegin, xend) for y in range(ybegin, yend)]
                 for x, y in ind.starting_points:
                     if xbegin <= x < xend and ybegin <= y < yend:
@@ -52,3 +51,22 @@ def random_swap_in_square(ind):
                 x1, y1 = points_to_swap[0]
                 x2, y2 = points_to_swap[1]
                 ind.sudoku[x1, y1], ind.sudoku[x2, y2] = ind.sudoku[x2, y2], ind.sudoku[x1, y1]
+
+
+def random_swap_in_square2(ind):
+    """
+    With given probability take 2 numbers in square and swap their positions.
+    """
+    ranges = [[0, 3], [3, 6], [6, 9]]
+    for xbegin, xend in ranges:
+        for ybegin, yend in ranges:
+            available_points = [(x, y) for x in range(xbegin, xend) for y in range(ybegin, yend)]
+            for x, y in ind.starting_points:
+                if xbegin <= x < xend and ybegin <= y < yend:
+                    available_points.remove((x, y))
+            if len(available_points) < 2:
+                continue
+            points_to_swap = random.sample(available_points, k=2)
+            x1, y1 = points_to_swap[0]
+            x2, y2 = points_to_swap[1]
+            ind.sudoku[x1, y1], ind.sudoku[x2, y2] = ind.sudoku[x2, y2], ind.sudoku[x1, y1]

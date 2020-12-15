@@ -13,6 +13,7 @@ def check_repetitions(row) -> int:
     numbers = set()
     for el in row:
         numbers.add(el)
+    # it can be slightly optimised by replacing the above with np.unique
 
     return 9 - len(numbers)
 
@@ -44,3 +45,19 @@ def _validate(sudoku: np.ndarray) -> int:
             total_repetitions += check_repetitions(square.flatten())
 
     return total_repetitions
+
+
+_NINE_FACTORIAL = 9 * 8 * 7 * 6 * 5 * 4 * 3 * 2 * 1
+
+
+def validate_chromosome_extended(chromosome: Chromosome) -> Tuple[int]:
+    sudoku = chromosome.sudoku
+
+    cols_sum = np.sum(np.abs(np.sum(sudoku, axis=0) - 45))
+    rows_sum = np.sum(np.abs(np.sum(sudoku, axis=1) - 45))
+    cols_prod = np.sum(np.sqrt(np.abs(np.product(sudoku, axis=0) - _NINE_FACTORIAL)))
+    rows_prod = np.sum(np.sqrt(np.abs(np.product(sudoku, axis=1) - _NINE_FACTORIAL)))
+    cols_miss = 9 - len(np.unique(sudoku, axis=0))
+    rows_miss = 9 - len(np.unique(sudoku, axis=1))
+
+    return 10 * (cols_sum + rows_sum) + cols_prod + rows_prod + 50 * (cols_miss + rows_miss),
