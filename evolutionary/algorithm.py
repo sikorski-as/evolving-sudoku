@@ -53,21 +53,11 @@ def run(cfg: config.EvolutionConfig) -> None:
             for child1, child2 in zip(offspring[::2], offspring[1::2]):
                 if random() < CXPB:
                     toolbox.mate_score(child1, child2)
-                    # if random() < 0.99:
-                    # if random() < 0.5:
-                    #     toolbox.mate_c(child1, child2)
-                    # else:
-                    #     toolbox.mate_r(child1, child2)
-                    # else:
-                    #     toolbox.mate_s(child1, child2)
                     del child1.fitness.values
                     del child2.fitness.values
 
             for mutant in offspring:
                 if random() < MXPB:
-                    # if random() < 0.1:
-                    #     toolbox.mutate(mutant)
-                    # else:
                     toolbox.mutate_swap(mutant)
                     del mutant.fitness.values
 
@@ -83,12 +73,6 @@ def run(cfg: config.EvolutionConfig) -> None:
             print(i, best.fitness)
             if best.fitness.values[0] == 0:
                 break
-            # if best.fitness.values[0] < currentBest:
-            #     currentBest = (best.fitness.values[0])
-            #     MXPB = MXPB * 0.9 if MXPB * 0.99 > 0.15 else 0.15
-            # else:
-            #     MXPB = MXPB * 1.5 if MXPB * 1.01 < 0.5 else 0.5
-            # MXPB = MXPB * 0.999 if MXPB * 0.99 > 0.10 else 0.10
 
     best = tools.selBest(population, 1)[0]
     print(best.fitness)
