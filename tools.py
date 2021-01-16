@@ -16,7 +16,10 @@ def load_instances(filename):
     for difficulty, instances in dataset.items():
         for instance in instances:
             instance['puzzle'] = np.array(instance['puzzle'])
-            instance['solution'] = np.array(instance['solution'])
+            try:
+                instance['solution'] = np.array(instance['solution'])
+            except:
+                instance['solution'] = None
 
     return dataset
 

@@ -1,8 +1,6 @@
 from typing import List, Tuple, Callable
 import numpy as np
 
-from evolutionary.config import DefaultConfig
-
 
 class Chromosome:
 
@@ -85,9 +83,3 @@ def generate_random_sudoku_instance_with_square_constraints(sudoku: np.ndarray) 
 def set_back_starting_points(ind) -> None:
     for x, y in ind.starting_points:
         ind.sudoku[x, y] = ind.sudoku_instance[x, y]
-
-
-if __name__ == '__main__':
-    cfg: DefaultConfig = DefaultConfig
-    # generate_random_sudoku_instance_with_row_constraints(cfg.sudoku_instance)
-    generate_random_sudoku_instance_with_square_constraints(cfg.sudoku_instance)

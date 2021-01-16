@@ -78,7 +78,7 @@ def test():
     repetitions = []
     are_the_same = []
 
-    instances = tools.load_instances("../data/instances.json")
+    instances = tools.load_instances("../data/instances_25_30_35.json")
     limit = 50
     for i, instance in enumerate(instances['easy'][:limit], start=1):
         puzzle, dataset_solution = instance['puzzle'], instance['solution']
