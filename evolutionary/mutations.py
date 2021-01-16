@@ -1,8 +1,5 @@
 import random
-
 import numpy as np
-
-from evolutionary import chromosome
 
 ranges = [[0, 3], [3, 6], [6, 9]]
 
