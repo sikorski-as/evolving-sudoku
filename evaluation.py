@@ -44,3 +44,21 @@ def _validate(sudoku: np.ndarray) -> int:
             total_repetitions += check_repetitions(square.flatten())
 
     return total_repetitions
+
+
+def is_row_valid(sudoku, row, col):
+    number = sudoku[row, col]
+    return np.count_nonzero(sudoku[row, :] == number) <= 1
+
+
+def is_column_valid(sudoku, row, col):
+    number = sudoku[row, col]
+    return np.count_nonzero(sudoku[:, col] == number) <= 1
+
+
+def is_square_valid(sudoku, row, col):
+    number = sudoku[row, col]
+    row_start = (row // 3) * 3
+    col_start = (col // 3) * 3
+    square = sudoku[row_start:row_start + 3, col_start:col_start + 3].flatten()
+    return np.count_nonzero(square == number) <= 1
