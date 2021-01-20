@@ -78,9 +78,10 @@ def test():
     repetitions = []
     are_the_same = []
 
-    instances = tools.load_instances("../data/instances_25_30_35.json")
+    instances = tools.load_instances("../data/new_instances_25_30_35_40.json")
+
     limit = 50
-    for i, instance in enumerate(instances['easy'][:limit], start=1):
+    for i, instance in enumerate(instances['easy40'][:limit], start=1):
         puzzle, dataset_solution = instance['puzzle'], instance['solution']
         possibilities = _precompute_possibilities(puzzle)
 
@@ -126,3 +127,7 @@ if __name__ == '__main__':
     # cfg = config.DefaultConfig
     # run(cfg)
     test()
+    # dataset = tools.load_instances("../data/new_instances_25_30_35_40.json")
+    # for level, instances in dataset.items():
+    #     print(len(set([instance['id'] for instance in instances])))
+
