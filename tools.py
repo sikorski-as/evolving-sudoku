@@ -1,6 +1,7 @@
 import json
 import math
 import time
+import types
 from contextlib import contextmanager
 from copy import deepcopy
 
@@ -22,6 +23,12 @@ def load_instances(filename):
                 instance['solution'] = None
 
     return dataset
+
+
+def load_sudoku_instances(filename):
+    with open(filename, 'r') as file:
+        instances = json.load(file, object_hook=lambda d: types.SimpleNamespace(**d))
+        return instances
 
 
 class Timer:
@@ -58,7 +65,7 @@ class Timer:
 
 
 class SolutionTracer:
-    def __init__(self, filename: str, collect_partial: bool = True, max_repetitions: int = 1000):
+    def __init__(self, filename: str, id: int, clues: int, collect_partial: bool = True, max_repetitions: int = 1000):
         self.filename = filename
         self.collect_partial = collect_partial
         self.best = None
@@ -67,6 +74,8 @@ class SolutionTracer:
         self.scores = []
         self.repetitions = 0
         self.max_repetitions = max_repetitions
+        self.id = id
+        self.clues = clues
 
     def update(self, solution, time):
         if self.collect_partial:
@@ -94,7 +103,9 @@ class SolutionTracer:
                 },
                 "Partial times": self.times,
                 "Partial scores": self.scores,
-                "Solution": self.best.sudoku.tolist()
+                "Solution": self.best.sudoku.tolist(),
+                "Id": self.id,
+                "Clues": self.clues
             }
         except AttributeError:
             result = {
@@ -106,7 +117,7 @@ class SolutionTracer:
             }
         print(result)
         file_name = "{}_{}".format(self.filename, time.time())
-        with open('results/{}'.format(file_name), mode='w') as file:
+        with open('results/{}/{}'.format(self.id, file_name), mode='w') as file:
             file.write(jsonpickle.encode(result))
 
     def __str__(self):
