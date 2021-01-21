@@ -1,4 +1,4 @@
-from random import random
+import random
 import numpy as np
 from evaluation import validate_chromosome
 from evolutionary import chromosome, config, mutations, crossovers
@@ -42,8 +42,8 @@ def run(cfg: config.EvolutionConfig) -> None:
     for ind, fit in zip(population, fitnesses):
         ind.fitness.values = fit
 
-    CXPB, MXPB = 0.4, 0.2
-    child_per_parent = 1
+    CXPB, MXPB = 0.3, 0.3
+    child_per_parent = 2
 
     i = 0
     with Timer() as timer, SolutionTracer(
@@ -60,14 +60,17 @@ def run(cfg: config.EvolutionConfig) -> None:
             offspring = list(map(toolbox.clone, child_per_parent * offspring))
 
             for child1, child2 in zip(offspring[::2], offspring[1::2]):
-                if random() < CXPB:
+                if random.random() < CXPB:
+                    # if random.random() < 0.5:
                     toolbox.mate_score(child1, child2)
+                    # else:
+                    #     toolbox.mate_r(child1, child2)
                     del child1.fitness.values
                     del child2.fitness.values
 
             for mutant in offspring:
-                if random() < MXPB:
-                    if random() < 0.8:
+                if random.random() < MXPB:
+                    if random.random() < 0.8:
                         toolbox.mutate_swap_many(mutant)
                     else:
                         toolbox.mutate_swap_one(mutant)
@@ -86,21 +89,34 @@ def run(cfg: config.EvolutionConfig) -> None:
             else:
                 best_offspring = offspring
 
-            population = best_offspring + population
+            population = choose_unique(best_offspring)
             population = toolbox.select_t(population, cfg.population_size)
 
             # saving and checking stats
             best = tools.selBest(population, 1)[0]
             solution_tracer.update(best, timer.elapsed)
-            print(i, best.fitness)
             if best.fitness.values[0] == 0:
                 break
             if i % 100 == 0:
+                print(i, best.fitness)
                 print(best.sudoku)
 
     best = tools.selBest(population, 1)[0]
     print(best.fitness)
     print(best.sudoku)
+
+
+def choose_unique(population: creator.Individual):
+    population_set = []
+    for el in population:
+        duplicate = False
+        for unique_el in population_set:
+            if (unique_el.sudoku == el.sudoku).all():
+                duplicate = True
+                break
+        if not duplicate:
+            population_set.append(el)
+    return population_set
 
 
 if __name__ == '__main__':
