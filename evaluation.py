@@ -21,6 +21,10 @@ def validate_chromosome(chromosome: Chromosome) -> Tuple[int]:
     return _validate(chromosome.sudoku),
 
 
+def validate_sudoku(sudoku: list) -> bool:  # list of lists as input
+    return _validate(np.array(sudoku)) == 0
+
+
 def _validate(sudoku: np.ndarray) -> int:
     """
         Checks if sudoku is correctly solved
