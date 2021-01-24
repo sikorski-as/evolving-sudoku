@@ -1,4 +1,5 @@
 import time
+import yaml
 
 import numpy as np
 
@@ -145,7 +146,52 @@ def run(cfg: config.DFSConfig) -> None:
     print('are they the same?', solution == cfg.sudoku_solution)
 
 
+def final_tests():
+    instances = tools.load_instances('../data/new_instances_25_30_35_40.json')
+    instances['01_easy'] = instances['easy40']; del instances['easy40']
+    instances['02_medium'] = instances['medium35']; del instances['medium35']
+    instances['03_advanced'] = instances['advanced30']; del instances['advanced30']
+    instances['04_hard'] = instances['hard25']; del instances['hard25']
+    instances_to_test = {
+        '01_easy': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+        '02_medium': [50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64],
+        '03_advanced': [100, 101, 102, 103, 104, 105, 106, 107, 108],
+        '04_hard': [150, 151, 152, 153, 154, 155, 156, 157, 158, 159],
+    }
+    sublist = lambda data, ix: [data[index] for index in ix]
+    time_results = {
+        '01_easy': {},
+        '02_medium': {},
+        '03_advanced': {},
+        '04_hard': {},
+    }
+
+    for difficulty_level, instances_ids in instances_to_test.items():
+        for instance_true_id in instances_ids:
+            index = instance_true_id % len(instances[difficulty_level])
+            instance = instances[difficulty_level][index]
+            puzzle = instance['puzzle']
+
+            print(f'Starting instance #{instance_true_id}')
+            start = time.time()
+            puzzle, possibilities = _preprocess_puzzle(puzzle)
+            dfs_solution = _dfs(puzzle, possibilities)
+            end = time.time()
+
+            time_taken = end - start
+            time_results[difficulty_level][instance_true_id] = time_taken
+
+            reps = _validate(dfs_solution)
+            if reps > 0:
+                print(f'instance #{instance_true_id} was not solved properly!')
+            print(dfs_solution)
+
+    with open('dfs_report.yaml', 'w') as f:
+        yaml.dump(time_results, f)
+
+
 if __name__ == '__main__':
     # cfg = config.DefaultConfig
     # run(cfg)
-    test()
+    # test()
+    final_tests()

@@ -6,7 +6,6 @@ import statistics
 import numpy as np
 import yaml
 import pathlib
-from pprint import pprint
 from matplotlib import pyplot as plt
 
 import jsonpickle
@@ -23,6 +22,24 @@ def load_json(path):
     except json.decoder.JSONDecodeError:
         error_files.append(path)
         return None
+
+
+def get_instances_ids_from_results_dir(rootdir: str, instances_filter=lambda x: True):
+    root = pathlib.Path(rootdir)
+    return sorted([int(instance_id) for instance_id in filter(instances_filter, os.listdir(root))])
+
+
+def get_instances_ids_from_results_dir_for_difficulty_level(rootdir: str, difficulty_level_name: str):
+    try:
+        instances_filter = {
+            '01_easy': lambda x: 0 <= int(x) < 50,
+            '02_medium': lambda x: 50 <= int(x) < 100,
+            '03_advanced': lambda x: 100 <= int(x) < 150,
+            '04_hard': lambda x: 150 <= int(x) < 200,
+        }[difficulty_level_name]
+        return get_instances_ids_from_results_dir(rootdir, instances_filter=instances_filter)
+    except KeyError:
+        raise ValueError("unknown difficulty level")
 
 
 def get_instances_results(rootdir: str, instances_filter=lambda x: True):
